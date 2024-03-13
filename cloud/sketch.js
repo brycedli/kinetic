@@ -8,17 +8,17 @@ let timeEnded;
 let wordList = [
                 "Our Capstone",
                 "Recap",
-                "change OF air", 
-                "blue skies",
-                "work",
-                "weather forecast"
+                "Change of Air", 
+                "Blue Skies",
+                "Work",
+                "Weather Forecast"
               ];
 let wordPositions = [];
 let wordIndex = 0;
 let centroid;
 let wordBox;
 let oldWordBox;
-let noiseScale = 40;
+let noiseScale = 20;
 let noiseSampleScale = 0.003;
 let deviation = 0.2;
 let noiseSpeed = 0.01;
@@ -90,9 +90,12 @@ function draw() {
     })
     i = 0;
     let cloudIndex = floor(constrain(map(sqrt(endT * 3), 0, 1, 0, cloudBuffers.length), 0, cloudBuffers.length - 1));
+    
     drawOldpoints.forEach(p => {
+      let xNoise = map(noise(frameCount* noiseSpeed + i * deviation + p.x * noiseSampleScale), 0, 1, -1, 1);
+      let yNoise = map(noise(frameCount* noiseSpeed + i * deviation + p.y * noiseSampleScale), 0, 1, -1, 1);
       push();
-      translate(p.x + noiseScale * noise(frameCount* noiseSpeed + i * deviation + p.x * noiseSampleScale), p.y + noiseScale* noise(frameCount* noiseSpeed + i * deviation  + p.y * noiseSampleScale));
+      translate(p.x + noiseScale * xNoise, p.y + noiseScale * yNoise);
       rotate(TWO_PI * noise(frameCount* noiseRotation + i));
       imageMode(CENTER)
       image(cloudBuffers[cloudIndex], 0, 0, 25 + 20 * noise(i), 25 + 20 * noise(i));
@@ -138,9 +141,10 @@ function draw() {
   shortT = gain(shortT, 2);
   let cloudIndex = floor(constrain(map(shortT, 1, 0, 0, cloudBuffers.length), 0, cloudBuffers.length - 1));
   points.forEach(p =>  {
-    
+    let xNoise = map(noise(frameCount* noiseSpeed + i * deviation + p.x * noiseSampleScale), 0, 1, -1, 1);
+    let yNoise = map(noise(frameCount* noiseSpeed + i * deviation + p.y * noiseSampleScale), 0, 1, -1, 1);
     push();
-    translate(p.x + noiseScale * noise(frameCount* noiseSpeed + i * deviation + p.x * noiseSampleScale), p.y + noiseScale* noise(frameCount* noiseSpeed + i * deviation  + p.y * noiseSampleScale));
+    translate(p.x + noiseScale * xNoise, p.y + noiseScale* yNoise);
     rotate(TWO_PI * noise(frameCount* noiseRotation + i));
     imageMode(CENTER)
     image(cloudBuffers[cloudIndex], 0, 0, 25 + 20 * noise(i), 25 + 20 * noise(i));
