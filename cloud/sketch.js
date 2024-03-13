@@ -12,7 +12,7 @@ let wordList = [
                 "Blue Skies",
                 "Updates",
                 "Weather Forecast",
-                "hellooo"
+                "Thanks!"
               ];
 let wordPositions = [];
 let wordIndex = 0;
