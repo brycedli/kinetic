@@ -10,8 +10,9 @@ let wordList = [
                 "Recap",
                 "Change of Air", 
                 "Blue Skies",
-                "Work",
-                "Weather Forecast"
+                "Updates",
+                "Weather Forecast",
+                "hellooo"
               ];
 let wordPositions = [];
 let wordIndex = 0;
@@ -63,6 +64,7 @@ function setup() {
 
 function draw() { 
   image(bg, 0, 0, windowWidth, windowHeight);
+  // background(bgColor);
   let t = 0;
   let period = 3000;
   let period2 = 3000;
