@@ -6,13 +6,11 @@ let oldPoints;
 let timeStarted;
 let timeEnded;
 let wordList = [
-                "Our Capstone",
-                "Recap",
-                "Change of Air", 
-                "Blue Skies",
-                "Updates",
-                "Weather Forecast",
-                "Thanks!"
+                "AaBbCcDdEeFf",
+                "GgHhIiJjKkLlMm",
+                "NnOoPpQqRrSsTt", 
+                "UuVvWwXxYyZz",
+
               ];
 let wordPositions = [];
 let wordIndex = 0;
