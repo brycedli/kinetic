@@ -15,7 +15,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(0);
-  background(255, 153, 10);
+  // background(255, 153, 10);
   position =  new p5.Vector(width/2+1,height/2+1);
   
 }
@@ -31,7 +31,7 @@ function randomizeDirection() {
 }
 function draw() { 
   blendMode(BLEND)
-  background(255, 153, 10, 12);
+  background(0, 12);
   blendMode(SCREEN);
   imageMode(CENTER);
   let total = 6;
