@@ -1,5 +1,5 @@
 let input, button, greeting, font, slice, bgImage;
-
+let canvas;
 let points; 
 let sliceOpacities = [];
 
@@ -22,9 +22,9 @@ function opacities (texture, n) {
 }
 function setup() {
     // create canvas
-    createCanvas(windowWidth, windowHeight);
+    canvas = createCanvas(windowWidth, windowHeight);
     input = createInput();
-    input.value("Hello World");
+    input.value("abcdefg");
     input.position(20, 65);
     sliceOpacities = opacities(slice, 100);
 }
@@ -48,3 +48,9 @@ function draw () {
         pop();
     }
 }
+
+function keyPressed() {
+    if (key === 'p') {
+        saveCanvas('myCanvas', 'jpg');
+    }
+  }
