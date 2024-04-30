@@ -1,5 +1,5 @@
 let cloudURLs = ["/clouds/cloud-1.png", "/clouds/cloud-2.png", "/clouds/cloud-3.png"];
-// let cloudURLs = ["cloud-lighter.png"];
+// let cloudURLs = ["cloud_1.png"];
 let clouds = [];
 let font;
 let cloudBuffers = [];
@@ -13,6 +13,10 @@ let thresholdSliderUpper;
 let thresholdSliderLower;
 let invertImage = false;
 
+let finalPoints = []
+let pointCount = 2000
+
+let textPoints;
 function preload() {
   cloudURLs.forEach(url => {
     let cloud = loadImage(url);
@@ -25,14 +29,14 @@ function preload() {
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  let n = 10;
+  let n = 20;
   clouds.forEach(c => {
     let buffer = [];
     cloudBuffers.push(buffer);
     for (let i = 0; i < n; i++) {
-      let bufferSize = 32;
+      let bufferSize = 16;
       let cloudBuffer = createGraphics(bufferSize, bufferSize);
-      cloudBuffer.tint(255, map(i, 0, n, 10, 30));
+      cloudBuffer.tint(255, map(i, 0, n, 10, 40));
       cloudBuffer.image(c, 0, 0, bufferSize, bufferSize);
       buffer.push(cloudBuffer);
     }
@@ -53,7 +57,7 @@ function setup() {
   backgroundSelect.position(20, 140);
   backgroundSelect.option('sky');
   backgroundSelect.option('black');
-  backgroundSelect.value('black');
+  backgroundSelect.value('sky');
   
   imageScale = createSlider(0, 255);
   imageScale.position(20, 170);
@@ -66,6 +70,25 @@ function setup() {
   thresholdSliderLower.position(20, 230);
   thresholdSliderLower.value(0)
 
+  // textPoints = font.textToPoints(textInput.value(), 0, 0, 200, { sampleFactor: 0.2 });
+  for (let i = 0; i < pointCount; i++) { 
+    let bounds = font.textBounds(textInput.value(), 0, 0, 200)
+    finalPoints.push(new Cloud(
+      random(width/2 - bounds.w/2, width/2 + bounds.w/2), 
+      random(height/2 - bounds.h/2, height/2 + bounds.h/2), 0)
+    )
+  }
+}
+
+function keyPressed() {
+  if (key === 'P') {
+    saveCanvas('myCanvas', 'jpg');
+  }
+  if (key == "i"){
+    invertImage = !invertImage
+  }
+
+  
 }
 
 function draw() {
@@ -75,10 +98,10 @@ function draw() {
   if (backgroundSelect.value() == 'black'){
     background(0);
   }
-  let textPoints = font.textToPoints(textInput.value(), 0, 0, 200, { sampleFactor: 0.5 });
+  
   
   let s = scaleSlider.value() / 255;
-  let finalPoints = []
+  
   let imageSampleSize = 2000
   if (userImage){
     // image(userImage, 0, 0, userImage.width, userImage.height)
@@ -87,7 +110,8 @@ function draw() {
     let tries = 0
     let maxTries = 2000
     // for (let i = 0; i < imageSampleSize; i++) {
-    while(finalPoints.length < imageSampleSize && tries < maxTries) {
+    let imagePoints = [];
+    while(imagePoints.length < imageSampleSize && tries < maxTries) {
       let px = random(0, userImage.width)
       let py = random(0, userImage.height)
       let pixelVal = brightness(userImage.get(px, py))
@@ -95,7 +119,6 @@ function draw() {
         pixelVal = 100 - pixelVal
       }
       if (pixelVal > thresholdSliderUpper.value()/255 * 100 || pixelVal < thresholdSliderLower.value()/255 * 100) {
-        print(pixelVal)
         tries ++
         continue
       }
@@ -104,84 +127,98 @@ function draw() {
       let imgScale = imageScale.value()/255
       px = map(px, 0, userImage.width, width/2 - userImage.width * imgScale / 2, width/2 + userImage.width * imgScale / 2)
       py = map(py, 0, userImage.height, height/2 - userImage.height * imgScale / 2, height/2 + userImage.height * imgScale / 2)
-      let r = random(0, 1) * Math.PI
-      // let s = scaleSlider.value() * pixelVal + 10
-      let s = 100
-      let b = cloudBuffers[floor(random(cloudBuffers.length-1))];
-      let bIndex = (map(pixelVal, 1, 0, 0, b.length-1));
-      let bImage = b[floor(bIndex)];
-      
-      finalPoints.push( new Cloud(px, py, r, s, bImage))
+      imagePoints.push(createVector(px, py))
     }
+    for (let i = 0; i < pointCount; i++) {
+      if (i < imagePoints.length) {
+        finalPoints[i].target = createVector(imagePoints[i].x, imagePoints[i].y, 1)
+      }
+      else{
 
-
-    
-
+        finalPoints[i].target = createVector(finalPoints[i].position.x, finalPoints[i].position.y, 0)
+      }
+    }
   }
   else {
-    for (let i = 0; i < textPoints.length; i++) {
-      let speed =  millis()/6000
-      let jSample = 0.008
-      let sSample = 0.01
-      let p = textPoints[i];
-          randomSeed(i * 200)
-      let n = randomGaussian(0.5, 0.1)
-      let n2 = noise(jSample*p.x+200 + speed, jSample*p.y+200 + speed)
-      let n3 = noise(jSample*p.x+400 + speed, jSample*p.y+400 + speed)
-      let n4 = noise(sSample*p.x+600, sSample*p.y+600)
-      // let nX = noise(p.x);
-      // let nY = noise(p.y);
-      let px = p.x + n2 * 60
-      let py = p.y + n3 * 60
-      let r = TWO_PI * n
-      let scale = 100 * (s+1) * n * n
-      let b = cloudBuffers[i % cloudBuffers.length];
-      let bIndex = (map(0.5, 1, 0, 0, b.length-1));
-      let bImage = b[floor(bIndex-1)+1];
-  
-      finalPoints.push( new Cloud(px, py, r, scale, bImage))
-  
+    textPoints = font.textToPoints(textInput.value(), 0, 0, 400 * imageScale.value()/255, { sampleFactor: 0.2 });
+    randomSeed(0)
+    for (let i = 0; i < pointCount; i++) {
       
-    }
-  }
-  
-
-
-  finalPoints.forEach(cloud => {
-    push()
-    if (!userImage){
-
-      translate(width / 2 - font.textBounds(textInput.value(), 0, 0, 200).w / 2, height / 2);
+      if (i < textPoints.length) {
+        let px = textPoints[i].x
+        let py = textPoints[i].y
+        px += width / 2 - font.textBounds(textInput.value(), 0, 0, 400 * imageScale.value()/255).w / 2
+        py += height /2
+        finalPoints[i].target = createVector(px, py, 1)
+        
+      }
+      else{
+        // finalPoints[i].target = createVector(mouseX, mouseY)
+        // finalPoints[i].target = createVector(finalPoints[i].position.x, finalPoints[i].position.y, 0)
+        if (textInput.value().length > 0) {
+          let bounds = font.textBounds(textInput.value(), 0, 0, 400 * imageScale.value()/255)
+          finalPoints[i].target = createVector(
+            random(width/2 + bounds.w/2, width/2 + bounds.w/2 + 200), 
+            random(height/2 - bounds.h * 2, height/2 + bounds.h), 0)
+        }else{
+          finalPoints[i].target = createVector(
+            random(width/2 - 40, width/2 + 40), 
+            random(height/2 - 40, height/2 + 40), 0)
+        }
+        
+    // finalPoints.push(new Cloud(
+    //   random(width/2 - bounds.w/2, width/2 + bounds.w/2), 
+    //   random(height/2 - bounds.h/2, height/2 + bounds.h/2), 0)
+    // )
+      }
+      // finalPoints.push( new Cloud(px, py))
     }
     
-    translate(cloud.x, cloud.y)
-    rotate(cloud.r)
-    imageMode(CENTER)
-
-    image(cloud.img, 0, 0, cloud.s, cloud.s)
-    pop()
-  })
-
+  }
   
 
-}
-function parabola(x) {
-  return 1 + 4 * x * x - 4 * x
-}
-function keyPressed() {
-  if (key === 'P') {
-    saveCanvas('myCanvas', 'jpg');
-  }
-  if (key == "i"){
-    invertImage = !invertImage
-  }
-}
-function mousePressed() {
+  let i = 0
+  let speed =  millis()/6000
+  let jSample = 0.008
+  let sSample = 0.01
+  randomSeed(0)
+  finalPoints.forEach(cloud => {
+    cloud.move()
+    push()
+    // randomSeed(i * 200)
+    let n = randomGaussian(0.5, 0.1)
+    let n2 = noise(jSample*cloud.position.x+200 + speed, jSample*cloud.position.y+200 + speed)
+    let n3 = noise(jSample*cloud.position.x+400 + speed, jSample*cloud.position.y+400 + speed)
+    let n4 = noise(sSample*cloud.position.x+600, sSample*cloud.position.y+600)
+    // let nX = noise(p.x);
+    // let nY = noise(p.y);
+    let px = cloud.position.x + n2 * 60
+    let py = cloud.position.y + n3 * 60
+    let r = TWO_PI * n
+    let scale = 100 * (s+1) * n * n * cloud.position.z + 1
+    let b = cloudBuffers[i % cloudBuffers.length];
+    let bIndex = (map(cloud.position.z, 0, 1, 0, b.length-1));
+    let bImage = b[floor(bIndex-1)+1];
 
+    if (!userImage){
+
+      // translate(width / 2 - font.textBounds(textInput.value(), 0, 0, 200).w / 2, height / 2);
+    }
+    
+    translate(px, py)
+    rotate(r)
+    imageMode(CENTER)
+
+    image(bImage, 0, 0, scale, scale)
+    pop()
+    i++
+  })
 }
+
+
+
 
 function handleFile(file) {
-  print(file);
 
   if (file.type === 'image') {
     userImage = loadImage(file.data, '');
@@ -193,12 +230,17 @@ function handleFile(file) {
 
 class Cloud {
     
-  constructor(x, y, r, s, img) {
-      this.x = x;
-      this.y = y;
-      this.r = r;
-      this.s = s;
-      this.img = img;
+  constructor(targetX, targetY, opacity) {
+      this.target = createVector(targetX, targetY, opacity);
+      this.position = createVector(targetX, targetY, 0);
+  }
+
+  move() {
+    let dir = p5.Vector.sub(this.target, this.position);
+    // dir.normalize();
+    dir.mult(0.03);
+    this.position.add(dir);
+    
   }
   
 }
