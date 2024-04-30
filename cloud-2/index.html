@@ -6,8 +6,45 @@
   <script language="javascript" type="text/javascript" src="sketch.js"></script>
 
 
-  <style> body {padding: 0; margin: 0;} </style>
+  <style> 
+  body {padding: 0; margin: 0;} 
+    input[type=text] {
+      
+      position: absolute;
+      bottom: 28px;
+      left: 20px;
+      width: 290px;
+      height: 36px;
+      background-color:transparent;
+      padding: 0px 20px;
+      font-family: "SF Pro Text";
+      font-size: 17px;
+      font-style: normal;
+      font-weight: 450;
+      line-height: 22px;
+      border-radius: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      border: 0px solid #ccc;
+      outline: none;
+      letter-spacing: 0.4px;
+    }
+    input[type=text]:focus {
+      color: var(--Text-Primary, rgba(255, 255, 255, 0.96));
+      /* letter-spacing: -0.4px; */
+    }
+    
+
+    </style>
 </head>
 <body>
+  <div style="position: absolute; left: calc(50% - 335px/2); width: 375px; height: 149px; bottom: 60px; 
+    border-radius: 32px;
+    background: url(uibg3.png);
+    background-size: 100%;">
+
+      <input type="text" id="input">
+   
+  </div>
+  
 </body>
 </html>

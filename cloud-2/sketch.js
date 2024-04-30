@@ -41,18 +41,22 @@ function setup() {
       buffer.push(cloudBuffer);
     }
   })
-
+/*
   imageInput = createFileInput(handleFile);
   imageInput.position(20, 20);
 
   scaleSlider = createSlider(0, 255);
   scaleSlider.value(128)
   scaleSlider.position(20, 100);
-
-  textInput = createInput();
-  textInput.value("hello sky");
-  textInput.position(20, 65);
+*/
+  // textInput = createInput();
+  textInput = document.getElementById("input");
+  textInput.value = "hello sky";
+  // textInput.value("hello sky");
+  // textInput.position(20, 65);
   
+  /*
+
   backgroundSelect = createSelect();
   backgroundSelect.position(20, 140);
   backgroundSelect.option('sky');
@@ -69,10 +73,10 @@ function setup() {
   thresholdSliderLower = createSlider(0, 255);
   thresholdSliderLower.position(20, 230);
   thresholdSliderLower.value(0)
-
+*/
   // textPoints = font.textToPoints(textInput.value(), 0, 0, 200, { sampleFactor: 0.2 });
   for (let i = 0; i < pointCount; i++) { 
-    let bounds = font.textBounds(textInput.value(), 0, 0, 200)
+    let bounds = font.textBounds(textInput.value, 0, 0, 200)
     finalPoints.push(new Cloud(
       random(width/2 - bounds.w/2, width/2 + bounds.w/2), 
       random(height/2 - bounds.h/2, height/2 + bounds.h/2), 0)
@@ -92,15 +96,18 @@ function keyPressed() {
 }
 
 function draw() {
+  /*
   if (backgroundSelect.value() == 'sky'){
     background(bg);
   }
   if (backgroundSelect.value() == 'black'){
     background(0);
-  }
+  }*/
+  background(bg);
   
-  
-  let s = scaleSlider.value() / 255;
+  // let s = scaleSlider.value() / 255;
+  let s = 0.5;
+  let imageScaleValue = 0.5;
   
   let imageSampleSize = 2000
   if (userImage){
@@ -140,14 +147,15 @@ function draw() {
     }
   }
   else {
-    textPoints = font.textToPoints(textInput.value(), 0, 0, 400 * imageScale.value()/255, { sampleFactor: 0.2 });
+    
+    textPoints = font.textToPoints(textInput.value, 0, 0, 400 * imageScaleValue, { sampleFactor: 0.2 });
     randomSeed(0)
     for (let i = 0; i < pointCount; i++) {
       
       if (i < textPoints.length) {
         let px = textPoints[i].x
         let py = textPoints[i].y
-        px += width / 2 - font.textBounds(textInput.value(), 0, 0, 400 * imageScale.value()/255).w / 2
+        px += width / 2 - font.textBounds(textInput.value, 0, 0, 400 * imageScaleValue).w / 2
         py += height /2
         finalPoints[i].target = createVector(px, py, 1)
         
@@ -155,8 +163,8 @@ function draw() {
       else{
         // finalPoints[i].target = createVector(mouseX, mouseY)
         // finalPoints[i].target = createVector(finalPoints[i].position.x, finalPoints[i].position.y, 0)
-        if (textInput.value().length > 0) {
-          let bounds = font.textBounds(textInput.value(), 0, 0, 400 * imageScale.value()/255)
+        if (textInput.value.length > 0) {
+          let bounds = font.textBounds(textInput.value, 0, 0, 400 * imageScaleValue)
           finalPoints[i].target = createVector(
             random(width/2 + bounds.w/2, width/2 + bounds.w/2 + 200), 
             random(height/2 - bounds.h * 2, height/2 + bounds.h), 0)
